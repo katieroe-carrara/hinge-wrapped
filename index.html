@@ -22,7 +22,6 @@
   .step p { font-size: 13px; color: #999; line-height: 1.6; }
   .step code { background: #222; padding: 2px 6px; border-radius: 4px; font-size: 12px; color: #b388ff; }
 
-  /* Drop zone */
   .drop-zone { width: 100%; max-width: 560px; border: 2px dashed #333; border-radius: 16px; padding: 48px 32px; cursor: pointer; transition: all 0.3s; position: relative; }
   .drop-zone:hover, .drop-zone.dragover { border-color: #ff6b8a; background: rgba(255,107,138,0.04); }
   .drop-zone .icon { font-size: 40px; margin-bottom: 12px; }
@@ -34,14 +33,12 @@
   .privacy-note { max-width: 500px; margin-top: 32px; font-size: 12px; color: #555; line-height: 1.6; }
   .privacy-note strong { color: #888; }
 
-  /* Loading */
   #loading { display: none; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 40px; }
   .spinner { width: 48px; height: 48px; border: 3px solid #222; border-top-color: #ff6b8a; border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 20px; }
   @keyframes spin { to { transform: rotate(360deg); } }
   #loading h2 { font-size: 20px; color: #fff; margin-bottom: 8px; }
   #loading p { color: #888; font-size: 14px; }
 
-  /* Error */
   .error-msg { background: #2a1a1a; border: 1px solid #ff6b8a44; border-radius: 12px; padding: 20px; max-width: 500px; margin-top: 20px; display: none; }
   .error-msg h3 { color: #ff6b8a; font-size: 15px; margin-bottom: 8px; }
   .error-msg p { color: #999; font-size: 13px; line-height: 1.5; }
@@ -59,17 +56,20 @@
   .blue { color: #64b5f6; }
   .green { color: #81c784; }
   .orange { color: #ffb74d; }
+  .red { color: #ef5350; }
 
-  .summary-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; text-align: center; }
-  .summary-item .num { font-size: 36px; font-weight: 800; }
-  .summary-item .label { font-size: 12px; color: #888; margin-top: 4px; }
-  @media (max-width: 600px) { .summary-grid { grid-template-columns: repeat(3, 1fr); } }
+  .summary-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; text-align: center; }
+  .summary-item .num { font-size: 32px; font-weight: 800; }
+  .summary-item .label { font-size: 11px; color: #888; margin-top: 4px; }
+  .summary-sub { font-size: 10px; color: #666; margin-top: 2px; }
+  @media (max-width: 700px) { .summary-grid { grid-template-columns: repeat(2, 1fr); } }
 
   .funnel { display: flex; flex-direction: column; align-items: center; gap: 4px; margin: 20px 0; }
-  .funnel-bar { height: 44px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 13px; transition: all 0.3s; white-space: nowrap; min-width: fit-content; padding: 0 16px; }
+  .funnel-bar { height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 12px; transition: all 0.3s; white-space: nowrap; min-width: fit-content; padding: 0 14px; }
   .funnel-bar:hover { filter: brightness(1.2); }
-  .funnel-bar .funnel-detail { font-size: 11px; font-weight: 400; opacity: 0.8; margin-left: 8px; }
-  .conv-rate { font-size: 12px; color: #888; background: #222; padding: 3px 10px; border-radius: 10px; }
+  .funnel-bar .funnel-detail { font-size: 10px; font-weight: 400; opacity: 0.8; margin-left: 8px; }
+  .conv-rate { font-size: 11px; color: #888; background: #222; padding: 2px 10px; border-radius: 10px; }
+  .funnel-split { display: flex; gap: 6px; width: 100%; justify-content: center; }
 
   .chart-container { position: relative; height: 260px; }
 
@@ -95,6 +95,12 @@
 
   .reset-btn { display: inline-block; margin-top: 32px; padding: 10px 24px; background: #222; border: 1px solid #333; border-radius: 8px; color: #aaa; font-size: 13px; cursor: pointer; transition: all 0.2s; }
   .reset-btn:hover { background: #2a2a2a; color: #fff; }
+
+  .like-flow { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 12px 0; }
+  .like-box { background: #222; border-radius: 10px; padding: 16px; text-align: center; }
+  .like-box .big { font-size: 32px; font-weight: 800; }
+  .like-box .sub { font-size: 11px; color: #999; margin-top: 4px; }
+  .like-box .detail-row { font-size: 11px; color: #666; margin-top: 8px; line-height: 1.6; }
 </style>
 </head>
 <body>
@@ -154,12 +160,21 @@
   <p class="subtitle" id="dashSubtitle"></p>
 
   <div class="grid">
-    <div class="card">
+    <div class="card full-width">
       <h2>The Big Picture</h2>
       <div class="summary-grid" id="summaryGrid"></div>
     </div>
+  </div>
+
+  <div class="grid">
     <div class="card">
-      <h2>The Funnel</h2>
+      <h2>Likes: Sent vs Received</h2>
+      <div class="like-flow" id="likeFlow"></div>
+      <div class="chart-container" style="height:200px;"><canvas id="likeChart"></canvas></div>
+      <div class="insight" id="likeInsight"></div>
+    </div>
+    <div class="card">
+      <h2>The Full Funnel</h2>
       <div class="funnel" id="funnelViz"></div>
     </div>
   </div>
@@ -250,8 +265,7 @@ function handleFile(file) {
       const data = JSON.parse(e.target.result);
       if (!Array.isArray(data)) throw new Error('not-array');
       if (data.length === 0) throw new Error('empty');
-      // Hinge exports contain mix of likes, matches, and chats — validate at least some have expected fields
-      const hasHingeFields = data.some(e => e.match || e.like || e.chats);
+      const hasHingeFields = data.some(e => e.match || e.like || e.chats || e.block);
       if (!hasHingeFields) throw new Error('no-match-field');
       setTimeout(() => processData(data), 300);
     } catch (err) {
@@ -272,7 +286,7 @@ function handleFile(file) {
 // ════════════════ DATA PROCESSING ════════════════
 function processData(data) {
   const status = document.getElementById('loadingStatus');
-  status.textContent = `Analyzing ${data.length.toLocaleString()} matches...`;
+  status.textContent = `Analyzing ${data.length.toLocaleString()} entries...`;
 
   const phonePattern = /(\+?\d[\d\s\-]{7,14}\d)/;
   const contactSignal = /\b(my number|my whatsapp|here'?s my|text me at|call me at|add me on|whatsapp is|whatsapp me|number is|reach me)\b/i;
@@ -281,7 +295,17 @@ function processData(data) {
   const logisticsSignal = /(meet at|meet me at|see you at|pick you up|what time|at \d{1,2}(:\d{2})?\s*(pm|am)?|o'?clock|reservation|booked)/i;
   const cancelSignal = /(can'?t make it|have to cancel|rain ?check|reschedule|not going to work|something came up|won'?t be able|need to bail|make sense to cancel)/i;
 
-  let totalMatches = data.length;
+  // ── Top of funnel: classify every entry ──
+  let profilesSeen = data.length;
+  let youPassed = 0;        // block only, no like or match = you X'd them
+  let youLikedTotal = 0;    // has like field
+  let youLikedNoMatch = 0;  // like but no match = unrequited
+  let youLikedMatched = 0;  // like + match = you liked first, they matched
+  let theyLikedMatched = 0; // match but no like = they liked first, you matched
+  let totalMatches = 0;
+  let weMet = 0;
+
+  // ── Conversation stats ──
   let noChat = 0, hasChat = 0, phoneExchanged = 0, datesArranged = 0, dateAndContact = 0;
   let youStarted = 0, theyStarted = 0;
   let youStartedPhone = 0, theyStartedPhone = 0;
@@ -292,6 +316,25 @@ function processData(data) {
   const quarterlyMatches = {}, quarterlyConvos = {}, quarterlyPhones = {};
 
   for (const entry of data) {
+    const hasLike = 'like' in entry;
+    const hasMatch = 'match' in entry;
+    const hasBlock = 'block' in entry;
+    const hasChats = 'chats' in entry && entry.chats.length > 0;
+    const hasWeMet = 'we_met' in entry;
+
+    if (hasWeMet) weMet++;
+
+    // Classify entry type
+    if (hasLike) youLikedTotal++;
+    if (!hasLike && !hasMatch && hasBlock) { youPassed++; continue; }
+    if (hasLike && !hasMatch) { youLikedNoMatch++; continue; }
+    if (hasMatch) {
+      totalMatches++;
+      if (hasLike) youLikedMatched++;
+      else theyLikedMatched++;
+    }
+
+    // From here on, only matched entries
     const matchTs = (entry.match || [{}])[0]?.timestamp || '';
     const chats = entry.chats || [];
     const monthKey = matchTs.slice(0, 7);
@@ -374,7 +417,8 @@ function processData(data) {
 
   status.textContent = 'Building dashboard...';
   setTimeout(() => renderDashboard({
-    totalMatches, noChat, hasChat, phoneExchanged, datesArranged, dateAndContact,
+    profilesSeen, youPassed, youLikedTotal, youLikedNoMatch, youLikedMatched, theyLikedMatched,
+    totalMatches, weMet, noChat, hasChat, phoneExchanged, datesArranged, dateAndContact,
     youStarted, theyStarted, youStartedPhone, theyStartedPhone,
     youGhosted, theyGhosted, youLengths, theyLengths,
     msgCounts, phoneMsgCounts, nonPhoneMsgCounts,
@@ -390,45 +434,98 @@ function renderDashboard(d) {
 
   const pct = (a, b) => b ? (a / b * 100).toFixed(1) : '0.0';
   const avg = arr => arr.length ? (arr.reduce((a, b) => a + b, 0) / arr.length).toFixed(1) : '0';
-  const uniqueOutcomes = d.phoneExchanged + d.datesArranged - d.dateAndContact;
 
   // Date range
   const months = Object.keys(d.monthlyMatches).sort();
   const firstMonth = months[0] || 'N/A';
   const lastMonth = months[months.length - 1] || 'N/A';
   const formatMonth = m => { const [y, mo] = m.split('-'); const names = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']; return `${names[parseInt(mo)-1]} ${y}`; };
-  document.getElementById('dashSubtitle').textContent = `${formatMonth(firstMonth)} – ${formatMonth(lastMonth)}  ·  ${d.totalMatches.toLocaleString()} matches analyzed`;
+  document.getElementById('dashSubtitle').textContent = `${formatMonth(firstMonth)} – ${formatMonth(lastMonth)}  ·  ${d.profilesSeen.toLocaleString()} interactions analyzed`;
 
-  // Summary
+  // ─── Summary grid ───
+  const likeBackRate = d.youLikedTotal ? pct(d.youLikedMatched, d.youLikedTotal) : '0';
+  const totalLikes = d.youLikedTotal + d.theyLikedMatched;
   document.getElementById('summaryGrid').innerHTML = `
-    <div class="summary-item"><div class="num pink">${d.totalMatches.toLocaleString()}</div><div class="label">Total Matches</div></div>
-    <div class="summary-item"><div class="num purple">${d.hasChat.toLocaleString()}</div><div class="label">Conversations</div></div>
-    <div class="summary-item"><div class="num blue">${d.phoneExchanged}</div><div class="label">Contact Exchanges</div></div>
-    <div class="summary-item"><div class="num green">${d.datesArranged}</div><div class="label">Dates Arranged</div></div>
-    <div class="summary-item"><div class="num orange">${pct(uniqueOutcomes, d.totalMatches)}%</div><div class="label">Match → Date/# Rate</div></div>
+    <div class="summary-item"><div class="num pink">${totalLikes.toLocaleString()}</div><div class="label">Total Likes</div><div class="summary-sub">sent + received</div></div>
+    <div class="summary-item"><div class="num purple">${d.youLikedTotal.toLocaleString()}</div><div class="label">Likes Sent</div><div class="summary-sub">${pct(d.youLikedMatched, d.youLikedTotal)}% matched back</div></div>
+    <div class="summary-item"><div class="num" style="color:#81c784;">${d.theyLikedMatched.toLocaleString()}</div><div class="label">Likes Received</div><div class="summary-sub">${pct(d.theyLikedMatched, d.totalMatches)}% of matches</div></div>
+    <div class="summary-item"><div class="num blue">${d.totalMatches.toLocaleString()}</div><div class="label">Total Matches</div></div>
+    <div class="summary-item"><div class="num green">${d.hasChat.toLocaleString()}</div><div class="label">Conversations</div></div>
+    <div class="summary-item"><div class="num orange">${d.phoneExchanged}</div><div class="label">Contact Exchanges</div></div>
+    <div class="summary-item"><div class="num" style="color:#80cbc4;">${d.datesArranged}</div><div class="label">Dates Arranged</div></div>
+    <div class="summary-item"><div class="num" style="color:#ce93d8;">${d.weMet}</div><div class="label">Likely Met IRL</div></div>
   `;
 
-  // Funnel
+  // ─── Likes sent vs received ───
+  const youLikedBackRate = pct(d.youLikedMatched, d.youLikedTotal);
+  const theyLikedYou = d.theyLikedMatched; // they liked you and you matched
+  document.getElementById('likeFlow').innerHTML = `
+    <div class="like-box">
+      <div class="big pink">${d.youLikedTotal.toLocaleString()}</div>
+      <div class="sub">Likes You Sent</div>
+      <div class="detail-row">
+        ✅ ${d.youLikedMatched} matched back (${youLikedBackRate}%)<br>
+        ❌ ${d.youLikedNoMatch} no match (${pct(d.youLikedNoMatch, d.youLikedTotal)}%)
+      </div>
+    </div>
+    <div class="like-box">
+      <div class="big green">${theyLikedYou.toLocaleString()}</div>
+      <div class="sub">They Liked You First</div>
+      <div class="detail-row">
+        You matched with all of them<br>
+        ${pct(theyLikedYou, d.totalMatches)}% of your matches
+      </div>
+    </div>
+  `;
+
+  // Like source chart
+  new Chart(document.getElementById('likeChart'), {
+    type: 'doughnut',
+    data: {
+      labels: ['You liked first → match', 'They liked first → match', 'You liked → no match'],
+      datasets: [{
+        data: [d.youLikedMatched, d.theyLikedMatched, d.youLikedNoMatch],
+        backgroundColor: ['#ff6b8a', '#81c784', '#444'],
+        borderWidth: 0, borderRadius: 3
+      }]
+    },
+    options: { responsive: true, maintainAspectRatio: false, cutout: '55%', plugins: { legend: { position: 'bottom', labels: { color: '#aaa', font: { size: 10 }, padding: 10, boxWidth: 12 } } } }
+  });
+
+  const pickier = d.youLikedTotal < d.youPassed;
+  document.getElementById('likeInsight').innerHTML = pickier
+    ? `<strong>You're selective:</strong> You only liked ${pct(d.youLikedTotal, d.profilesSeen)}% of profiles you saw. Of those likes, ${youLikedBackRate}% matched back. Meanwhile, <strong>${d.theyLikedMatched} people liked you first</strong> — that's ${pct(d.theyLikedMatched, d.totalMatches)}% of your total matches.`
+    : `<strong>You swipe generously:</strong> You liked ${pct(d.youLikedTotal, d.profilesSeen)}% of profiles. Your match-back rate is ${youLikedBackRate}%, and ${d.theyLikedMatched} people liked you first.`;
+
+  // ─── Funnel ───
   const convoRate = pct(d.hasChat, d.totalMatches);
+  const uniqueOutcomes = d.phoneExchanged + d.datesArranged - d.dateAndContact;
   const outcomeRate = pct(uniqueOutcomes, d.hasChat);
   document.getElementById('funnelViz').innerHTML = `
-    <div class="funnel-bar" style="width:100%; background: linear-gradient(90deg, #ff6b8a, #ff4081);">
-      ${d.totalMatches.toLocaleString()} Matches <span class="funnel-detail">100%</span>
+    <div class="funnel-bar" style="width:100%; background: linear-gradient(90deg, #555, #444);">
+      ${d.profilesSeen.toLocaleString()} Profiles Swiped On
+    </div>
+    <div class="conv-rate">↓ ${pct(d.youLikedTotal, d.profilesSeen)}% liked · ${pct(d.youPassed, d.profilesSeen)}% passed</div>
+    <div class="funnel-bar" style="width:70%; background: linear-gradient(90deg, #ff6b8a, #ff4081);">
+      ${d.youLikedTotal.toLocaleString()} Likes Sent <span class="funnel-detail">${pct(d.youLikedTotal, d.profilesSeen)}%</span>
+    </div>
+    <div class="conv-rate">↓ ${youLikedBackRate}% matched back  ·  +${d.theyLikedMatched} incoming</div>
+    <div class="funnel-bar" style="width:50%; background: linear-gradient(90deg, #b388ff, #9c5cf7);">
+      ${d.totalMatches.toLocaleString()} Matches <span class="funnel-detail">${pct(d.totalMatches, d.profilesSeen)}%</span>
     </div>
     <div class="conv-rate">↓ ${convoRate}% reply</div>
-    <div class="funnel-bar" style="width:50%; background: linear-gradient(90deg, #b388ff, #9c5cf7);">
-      ${d.hasChat.toLocaleString()} Conversations <span class="funnel-detail">${convoRate}%</span>
+    <div class="funnel-bar" style="width:35%; background: linear-gradient(90deg, #64b5f6, #42a5f5);">
+      ${d.hasChat.toLocaleString()} Conversations <span class="funnel-detail">${pct(d.hasChat, d.profilesSeen)}%</span>
     </div>
     <div class="conv-rate">↓ ${outcomeRate}% get somewhere</div>
-    <div style="display:flex; gap:8px; width:28%; min-width:fit-content;">
-      <div class="funnel-bar" style="flex:1; background: linear-gradient(90deg, #64b5f6, #42a5f5);">
-        ${d.phoneExchanged} Numbers <span class="funnel-detail">${pct(d.phoneExchanged, d.totalMatches)}%</span>
+    <div style="display:flex; gap:6px; width:25%; min-width:fit-content;">
+      <div class="funnel-bar" style="flex:1; background: linear-gradient(90deg, #ffb74d, #ffa726); font-size:11px;">
+        ${d.phoneExchanged} #s Exchanged
       </div>
-      <div class="funnel-bar" style="flex:1; background: linear-gradient(90deg, #81c784, #66bb6a);">
-        ${d.datesArranged} Dates <span class="funnel-detail">${pct(d.datesArranged, d.totalMatches)}%</span>
+      <div class="funnel-bar" style="flex:1; background: linear-gradient(90deg, #ce93d8, #ab47bc); font-size:11px;">
+        ${d.weMet} Likely Met IRL
       </div>
     </div>
-    ${d.dateAndContact > 0 ? `<div style="display:flex;gap:16px;margin-top:2px;"><div class="conv-rate" style="font-size:10px;">${d.dateAndContact} had both</div></div>` : ''}
   `;
 
   // ─── Matches over time ───
@@ -550,19 +647,17 @@ function renderDashboard(d) {
 
   // ─── Takeaways ───
   const noConvoPct = pct(d.noChat, d.totalMatches);
-  let takeawayHtml = `<div class="insight" style="border-left-color:#ff6b8a;"><strong>${noConvoPct}% of matches go nowhere</strong> — only ${d.hasChat} out of ${d.totalMatches.toLocaleString()} matches led to any conversation.</div>`;
+  let takeawayHtml = `<div class="insight" style="border-left-color:#ff6b8a;"><strong>${pct(d.youPassed, d.profilesSeen)}% of swipes were a pass</strong> — you X'd ${d.youPassed.toLocaleString()} out of ${d.profilesSeen.toLocaleString()} profiles and liked ${d.youLikedTotal.toLocaleString()}.</div>`;
+  takeawayHtml += `<div class="insight" style="border-left-color:#b388ff;"><strong>${pct(d.youLikedNoMatch, d.youLikedTotal)}% of your likes went unrequited</strong> — ${d.youLikedNoMatch} people you liked never matched back. Your match-back rate is ${pct(d.youLikedMatched, d.youLikedTotal)}%.</div>`;
+  takeawayHtml += `<div class="insight" style="border-left-color:#81c784;"><strong>${pct(d.theyLikedMatched, d.totalMatches)}% of matches came to you</strong> — ${d.theyLikedMatched} people liked you first. You initiated the other ${d.youLikedMatched}.</div>`;
+  if (d.weMet > 0) {
+    takeawayHtml += `<div class="insight" style="border-left-color:#ce93d8;"><strong>You likely met ${d.weMet} people IRL</strong> — out of ${d.totalMatches} matches, that's ${pct(d.weMet, d.totalMatches)}% that made it all the way.</div>`;
+  }
   if (ratio && parseFloat(ratio) > 1) {
-    takeawayHtml += `<div class="insight" style="border-left-color:#81c784;"><strong>Your openers convert ${ratio}x better</strong> — when you message first, ${youPhoneRate}% of convos lead to a contact exchange vs. ${theyPhoneRate}% when they start.</div>`;
-  }
-  if (parseFloat(avgPhone) > parseFloat(avgNoPhone)) {
-    takeawayHtml += `<div class="insight" style="border-left-color:#b388ff;"><strong>The ${Math.round(avgPhone/2)}-message threshold matters</strong> — contact exchanges happen in convos averaging ${avgPhone} messages, much longer than the ${avgNoPhone} average.</div>`;
-  }
-  if (d.datesArranged > 0) {
-    const onApp = d.datesArranged - d.dateAndContact;
-    takeawayHtml += `<div class="insight" style="border-left-color:#81c784;"><strong>Most dates happen on-app</strong> — of ${d.datesArranged} dates arranged, ${onApp} were planned without exchanging numbers first.</div>`;
+    takeawayHtml += `<div class="insight" style="border-left-color:#64b5f6;"><strong>Your openers convert ${ratio}x better</strong> — when you message first, ${youPhoneRate}% of convos lead to a contact exchange vs. ${theyPhoneRate}% when they start.</div>`;
   }
   if (improving) {
-    takeawayHtml += `<div class="insight" style="border-left-color:#64b5f6;"><strong>You're getting better over time</strong> — your match-to-convo rate has climbed from ~${firstQ.toFixed(0)}% to ~${lastQ.toFixed(0)}%.</div>`;
+    takeawayHtml += `<div class="insight" style="border-left-color:#ffb74d;"><strong>You're getting better over time</strong> — your match-to-convo rate has climbed from ~${firstQ.toFixed(0)}% to ~${lastQ.toFixed(0)}%.</div>`;
   }
   document.getElementById('takeaways').innerHTML = takeawayHtml;
 }
